@@ -1,0 +1,11 @@
+
+smoke.o:     file format elf32-i386
+
+
+Disassembly of section .text:
+
+00000000 <.text>:
+   0:	8d 6c 24 28          	lea    0x28(%esp),%ebp
+   4:	b8 50 b2 ff 5a       	mov    $0x5affb250,%eax
+   9:	68 cf 8c 04 08       	push   $0x8048ccf
+   e:	c3                   	ret    

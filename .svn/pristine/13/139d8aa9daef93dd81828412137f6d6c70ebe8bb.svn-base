@@ -1,0 +1,14 @@
+1. 	When entry cd. nothing happened.
+	When entry cd.. directory went to upper file until it was '/'
+
+2.	When installing vmware-tool. I need to ren the executive file, so I can cd to the directory and then entry ./vmware-install.pl
+
+3.	ps -A h --sort=command
+
+4.	grep ^a /usr/share/dict/words | wc -l
+
+5.	ls -S -r -l /etc/*.conf | head -5
+
+6.	the command in echo.sh: echo hello world!
+	make the file executable: chmod +x echo.sh
+	run it: ./echo.sh
