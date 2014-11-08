@@ -4,9 +4,13 @@
 # Return the number of positive ints (>0) contained in src.
 #
 # Include your name and ID here.
-#
+# 5130379013 Zhu Chaojie
 # Describe how and why you modified the baseline code.
-#
+# * Add instruction iaddl to replace irmovl+addl
+# * Loop unrolling to speed up
+# * Union two adjacent mrmovl to reduce hazard
+# * Jump table to speed up
+# * Halt after getting the result
 ##################################################################
 # Do not modify this portion
 # Function prologue.
@@ -22,23 +26,176 @@ ncopy:	pushl %ebp		# Save old frame pointer
 ##################################################################
 # You can modify this portion
 	# Loop header
-	xorl %eax,%eax		# count = 0;
-	andl %edx,%edx		# len <= 0?
-	jle Done		# if so, goto Done:
-
-Loop:	mrmovl (%ebx), %esi	# read val from src...
-	rmmovl %esi, (%ecx)	# ...and store it to dst
-	andl %esi, %esi		# val <= 0?
-	jle Npos		# if so, goto Npos:
-	irmovl $1, %edi
-	addl %edi, %eax		# count++
-Npos:	irmovl $1, %edi
-	subl %edi, %edx		# len--
-	irmovl $4, %edi
-	addl %edi, %ebx		# src++
-	addl %edi, %ecx		# dst++
-	andl %edx,%edx		# len > 0?
-	jg Loop			# if so, goto Loop:
+	xorl %eax,%eax		
+	iaddl $-15, %edx		
+	jle Out		
+Loop:	mrmovl (%ebx), %esi
+	mrmovl 4(%ebx), %edi 
+	rmmovl %esi, (%ecx)	
+	rmmovl %edi, 4(%ecx)
+	andl %esi, %esi
+	jle A		
+	iaddl $1, %eax		
+A:	andl %edi, %edi	
+	jle B		
+	iaddl $1, %eax		
+B:	mrmovl 8(%ebx), %esi
+	mrmovl 12(%ebx), %edi 
+	rmmovl %esi, 8(%ecx)
+	rmmovl %edi, 12(%ecx)
+	andl %esi, %esi		
+	jle C		
+	iaddl $1, %eax		
+C:	andl %edi, %edi		
+	jle D		
+	iaddl $1, %eax		
+D:	mrmovl 16(%ebx), %esi
+	mrmovl 20(%ebx), %edi 
+	rmmovl %esi, 16(%ecx)
+	rmmovl %edi, 20(%ecx)
+	andl %esi, %esi		
+	jle E		
+	iaddl $1, %eax	
+E:	andl %edi, %edi		
+	jle F		
+	iaddl $1, %eax		
+F:	mrmovl 24(%ebx), %esi 
+	mrmovl 28(%ebx), %edi 
+	rmmovl %esi, 24(%ecx)
+	rmmovl %edi, 28(%ecx)
+	andl %esi, %esi		
+	jle G		
+	iaddl $1, %eax		
+G:	andl %edi, %edi		
+	jle H		
+	iaddl $1, %eax		
+H:	mrmovl 32(%ebx), %esi
+	mrmovl 36(%ebx), %edi 
+	rmmovl %esi, 32(%ecx)
+	rmmovl %edi, 36(%ecx)
+	andl %esi, %esi		
+	jle I		
+	iaddl $1, %eax	
+I:	andl %edi, %edi		
+	jle J		
+	iaddl $1, %eax	
+J:	mrmovl 40(%ebx), %esi 
+	mrmovl 44(%ebx), %edi 
+	rmmovl %esi, 40(%ecx)
+	rmmovl %edi, 44(%ecx)
+	andl %esi, %esi		
+	jle K		
+	iaddl $1, %eax	
+K:	andl %edi, %edi		
+	jle L		
+	iaddl $1, %eax	
+L:	mrmovl 48(%ebx), %esi
+	mrmovl 52(%ebx), %edi  
+	rmmovl %esi, 48(%ecx)
+	rmmovl %edi, 52(%ecx)
+	andl %esi, %esi		
+	jle M		
+	iaddl $1, %eax	
+M:	andl %edi, %edi		
+	jle N		
+	iaddl $1, %eax	
+N:	mrmovl 56(%ebx), %esi 
+	mrmovl 60(%ebx), %edi 
+	rmmovl %esi, 56(%ecx)
+	rmmovl %edi, 60(%ecx)
+	andl %esi, %esi		
+	jle O		
+	iaddl $1, %eax	
+O:	andl %edi, %edi		
+	jle NEXT		
+	iaddl $1, %eax	
+NEXT:	iaddl $64, %ebx		
+	iaddl $64, %ecx		
+	andl %edx,%edx		
+	iaddl $-16, %edx		
+	jg Loop			
+Out:	iaddl $15, %edx
+	addl %edx, %edx		
+	addl %edx, %edx
+	mrmovl J17(%edx), %edx 
+	pushl %edx
+	ret
+J15: mrmovl 56(%ebx), %esi
+	rmmovl %esi, 56(%ecx)
+	andl %esi, %esi
+	jle J14
+	iaddl $1, %eax
+J14: mrmovl 52(%ebx), %esi
+	rmmovl %esi, 52(%ecx)
+	andl %esi, %esi
+	jle J13
+	iaddl $1, %eax
+J13: mrmovl 48(%ebx), %esi
+	rmmovl %esi, 48(%ecx)
+	andl %esi, %esi
+	jle J12
+	iaddl $1, %eax
+J12: mrmovl 44(%ebx), %esi
+	rmmovl %esi, 44(%ecx)
+	andl %esi, %esi
+	jle J11
+	iaddl $1, %eax
+J11: mrmovl 40(%ebx), %esi
+	rmmovl %esi, 40(%ecx)
+	andl %esi, %esi
+	jle J10
+	iaddl $1, %eax
+J10: mrmovl 36(%ebx), %esi
+	rmmovl %esi, 36(%ecx)
+	andl %esi, %esi
+	jle J9
+	iaddl $1, %eax
+J9: mrmovl 32(%ebx), %esi
+	rmmovl %esi, 32(%ecx)
+	andl %esi, %esi
+	jle J8
+	iaddl $1, %eax
+J8: mrmovl 28(%ebx), %esi
+	rmmovl %esi, 28(%ecx)
+	andl %esi, %esi
+	jle J7
+	iaddl $1, %eax
+J7: mrmovl 24(%ebx), %esi
+	rmmovl %esi, 24(%ecx)
+	andl %esi, %esi
+	jle J6
+	iaddl $1, %eax
+J6: mrmovl 20(%ebx), %esi
+	rmmovl %esi, 20(%ecx)
+	andl %esi, %esi
+	jle J5
+	iaddl $1, %eax
+J5: mrmovl 16(%ebx), %esi
+	rmmovl %esi, 16(%ecx)
+	andl %esi, %esi
+	jle J4
+	iaddl $1, %eax
+J4: mrmovl 12(%ebx), %esi
+	rmmovl %esi, 12(%ecx)
+	andl %esi, %esi
+	jle J3
+	iaddl $1, %eax
+J3: mrmovl 8(%ebx), %esi
+	rmmovl %esi, 8(%ecx)
+	andl %esi, %esi
+	jle J2
+	iaddl $1, %eax
+J2: mrmovl 4(%ebx), %esi
+	rmmovl %esi, 4(%ecx)
+	andl %esi, %esi
+	jle J1
+	iaddl $1, %eax
+J1:	mrmovl (%ebx), %esi
+	rmmovl %esi, (%ecx)
+	andl %esi, %esi
+	jle J0
+	iaddl $1, %eax
+J0:	jmp 0x29
 ##################################################################
 # Do not modify the following section of code
 # Function epilogue.
@@ -51,5 +208,24 @@ Done:
 	ret
 ##################################################################
 # Keep the following label at the end of your function
+
+	.align 4
+J17:	.long	J0
+	.long	J1
+	.long	J2
+	.long 	J3
+	.long	J4
+	.long	J5
+	.long	J6
+	.long	J7
+	.long	J8
+	.long	J9
+	.long	J10
+	.long 	J11
+	.long	J12
+	.long	J13
+	.long	J14
+	.long	J15
+
 End:
 #/* $end ncopy-ys */

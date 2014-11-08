@@ -1,0 +1,63 @@
+# 5130379013 Zhu Chaojie
+
+# Execution begins at address 0
+	.pos 0
+init:
+	irmovl Stack, %esp  	# Set up Stack pointer
+	irmovl Stack, %ebp  	# Set up base pointer
+	jmp Main		# Execute main program
+
+	.align 4
+# Source block
+src:
+	.long 0x00a
+	.long 0x0b0
+	.long 0xc00
+# Destination block
+dest:
+	.long 0x111
+	.long 0x222
+	.long 0x333
+
+Main:
+	irmovl $3, %edx
+	pushl %edx
+	irmovl dest, %edx
+	pushl %edx
+	irmovl src, %edx 		
+	pushl %edx
+	call Copy
+	halt
+
+Copy:
+	pushl %ebp
+	rrmovl %esp,%ebp
+	xorl %eax, %eax			# Set %eax to zero
+	mrmovl 0x10(%ebp), %ebx	
+	mrmovl 0x0c(%ebp), %ecx
+	mrmovl 0x08(%ebp), %edx
+
+Loop:
+	andl %ebx, %ebx 		
+	je Exit
+	mrmovl (%edx), %edi
+	rmmovl %edi, (%ecx)
+
+	irmovl $4, %esi	
+	addl %esi, %edx	
+	addl %esi, %ecx	
+
+	xorl %edi, %eax
+
+	irmovl $-1, %esi
+	addl %esi, %ebx
+
+	jmp Loop
+
+Exit:
+	rrmovl %ebp,%esp
+	popl %ebp
+	ret
+	
+	.pos 0x100
+Stack:  #The stack

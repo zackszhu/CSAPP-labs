@@ -1,0 +1,124 @@
+#######################################################################
+# Test for copying block of size 0;
+#######################################################################
+	.pos 0
+main:	irmovl Stack, %esp  	# Set up stack pointer
+	irmovl Stack, %ebp  	# Set up base pointer
+
+	# Set up arguments for copy function and then invoke it
+	irmovl $0, %eax		# src and dst have 0 elements
+	pushl %eax
+	irmovl dest, %eax	# dst array
+	pushl %eax
+	irmovl src, %eax	# src array
+	pushl %eax
+	call ncopy		 
+	halt			# should halt with num nonzeros in %eax
+StartFun:
+#/* $begin ncopy-ys */
+##################################################################
+# ncopy.ys - Copy a src block of len ints to dst.
+# Return the number of positive ints (>0) contained in src.
+#
+# Include your name and ID here.
+# 5130379013 Zhu Chaojie
+# Describe how and why you modified the baseline code.
+# * Add instruction iaddl to replace irmovl+addl
+##################################################################
+# Do not modify this portion
+# Function prologue.
+ncopy:	pushl %ebp		# Save old frame pointer
+	rrmovl %esp,%ebp	# Set up new frame pointer
+	pushl %esi		# Save callee-save regs
+	pushl %ebx
+	pushl %edi
+	mrmovl 8(%ebp),%ebx	# src
+	mrmovl 16(%ebp),%edx	# len
+	mrmovl 12(%ebp),%ecx	# dst
+
+##################################################################
+# You can modify this portion
+	# Loop header
+	xorl %eax,%eax		# count = 0;
+	iaddl $-1, %edx		# len <= 1?
+	andl %edx,%edx
+Loop:
+	je Out		# if so, goto Out:
+	jmp 0x29
+
+	mrmovl (%ebx), %esi	# read val from src...
+	mrmovl 4(%ebx), %edi 
+	rmmovl %esi, (%ecx)	# ...and store it to dst
+	rmmovl %edi, 4(%ecx)
+	andl %esi, %esi		# val <= 0?
+	jle Npos		# if so, goto Npos:
+	andl %edi, %edi		# val <= 0?
+	jle Npos		# if so, goto Npos:
+	iaddl $1, %eax		# count++
+Npos:
+	iaddl $-2, %edx		# len--
+	iaddl $4, %ebx		# src++
+	iaddl $4, %ecx		# dst++
+	andl %edx,%edx		# len > 0?
+	jg Loop			# if so, goto Loop:
+
+Out:
+	mrmovl (%ebx), %esi
+	rmmovl %esi, (%ecx)	# ...and store it to dst
+	andl %esi, %esi		# val <= 0?
+	jle A		# if so, goto Npos:
+	iaddl $1, %eax		# count++
+A:	
+	iaddl $-1, %edx		# len--
+	iaddl $4, %ebx		# src++
+	iaddl $4, %ecx		# dst++
+##################################################################
+# Do not modify the following section of code
+# Function epilogue.
+Done:
+	popl %edi               # Restore callee-save registers
+	popl %ebx
+	popl %esi
+	rrmovl %ebp, %esp
+	popl %ebp
+	ret
+##################################################################
+# Keep the following label at the end of your function
+End:
+#/* $end ncopy-ys */
+EndFun:
+
+###############################
+# Source and destination blocks 
+###############################
+	.align 4
+src:
+	.long 0xbcdefa # This shouldn't get moved
+
+	.align 16
+Predest:
+	.long 0xbcdefa
+dest:
+Postdest:
+	.long 0xdefabc
+
+.align 4
+# Run time stack
+	.long 0
+	.long 0
+	.long 0
+	.long 0
+	.long 0
+	.long 0
+	.long 0
+	.long 0
+	.long 0
+	.long 0
+	.long 0
+	.long 0
+	.long 0
+	.long 0
+	.long 0
+	.long 0
+
+Stack:
